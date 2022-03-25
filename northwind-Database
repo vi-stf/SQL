@@ -1,0 +1,175 @@
+--Q1 What is the name of a shipper that shipped most orders
+SELECT s.ShipperName, count(o.OrderID) from Shippers s
+INNER JOIN orders o
+using(ShipperID)
+GROUP by s.ShipperID;
+--Solution: United Package
+
+--Q2 What is the name of a product with the highest number of instances sold?
+SELECT p.ProductName,sum(od.quantity) as tot from Products p
+INNER JOIN OrderDetails od
+using(ProductID)
+group by p.ProductID
+ORDER by tot DESC;
+--Solution: Gorgonzola Telino
+
+--Q3 What is the first name of an employee who processed most orders in November 1996?
+ SELECT e.FirstName, count(o.OrderID) from Employees e
+ INNER JOIN Orders o
+using(EmployeeID)
+WHERE o.OrderDate BETWEEN '01/11/1996' and '31/11/1996'
+GROUP by e.EmployeeID
+Order by count(o.OrderID) DESC;
+--Solution: Margaret
+
+--Q4 How many products are available to the customer c from their own country?
+select count(p.ProductID) from Suppliers s
+inner join Products p using(SupplierID)
+INNER JOIN Customers c using(Country)
+WHERE c.country = (SELECT c.Country from Suppliers where c.CustomerName = 'Blauer See Delikatessen');
+--Solution: 9
+
+--Q5 What is the name of the product that generated most money from sales?
+SELECT p.ProductName, sum(od.Quantity* p.Price) FROM Products p
+INNER JOIN OrderDetails od using(ProductID)
+GROUP by p.ProductName
+ORDER by sum(od.Quantity* p.Price) DESC;
+--Solution: Cote De Blaye
+
+--Q6 What is the name of the product most frequently shipped by United Package?
+SELECT count(ProductID), p.ProductName from Shippers s
+INNER JOIN orders p using(ShipperID)
+INNER JOIN OrderDetails od using(OrderID)
+inner JOIN Products p using(ProductID)
+where s.ShipperName = 'United Package'
+group by p.ProductID
+order by count(ProductID) DESC;
+
+--Solution: Tarte au sucre
+
+--Q7 What is the name of the customer who made the most expensive order?
+SELECT sum(od.Quantity * p.price), c.CustomerName
+FROM Customers c
+INNER join orders o using(CustomerID)
+inner join OrderDetails od using(OrderID)
+INNER JOIN Products p using(ProductID)
+group by o.OrderID
+ORDER by sum(od.Quantity * p.price) DESC;
+--Solution: Queen Cozinha
+
+--Q8 What is the name of the customer who spent most money in total?
+SELECT c.CustomerName, sum(od.Quantity * p.price) from customers c
+INNER join  orders o using(CustomerID)
+inner join OrderDetails od using(OrderID)
+inner join Products p using(ProductID)
+group by c.CustomerID
+ORDER by sum(od.Quantity * p.price)  DESC;
+--Solution: Ernst Handel
+
+--Q9 What other category of products is most frequently bought together with Grains/Cereals? Please provide the category name.
+SELECT C2.CategoryName, COUNT(DISTINCT OD1.OrderID) times
+FROM OrderDetails OD1, Products P1, Categories C1, OrderDetails OD2, Products P2, Categories C2
+WHERE OD1.OrderID = OD2.OrderID
+AND OD1.ProductID = P1.ProductID
+AND OD2.ProductID = P2.ProductID
+AND C1.CategoryName = 'Grains/Cereals'
+AND C1.CategoryID = P1.CategoryID
+AND C2.CategoryID = P2.CategoryID
+AND C1.CategoryID &lt;&gt; C2.CategoryID
+GROUP BY C2.CategoryName
+ORDER BY times DESC;
+--Solution: Confections
+
+--Q10 What category of products is most often bought with Chang? Please provide the category name.
+SELECT P1.ProductID, P1.ProductName, C2.CategoryName, COUNT(OD1.OrderID)times
+FROM OrderDetails OD1, Products P1, Categories C1, OrderDetails OD2, Products P2, Categories C2
+WHERE OD1.OrderID = OD2.OrderID
+AND OD1.ProductID = P1.ProductID
+AND OD2.ProductID = P2.ProductID
+AND C1.CategoryID = P1.CategoryID
+AND C2.CategoryID = P2.CategoryID
+AND P1.ProductName = 'Chang';
+--Dairy Products
+
+--Q11 What is the contact name for the customer who made multiple orders on a single day?
+SELECT c.ContactName, count(o.OrderID) from Customers c
+inner join orders o using(CustomerID)
+group by o.OrderDate, CustomerID
+order by count(o.OrderID) DESC;
+--Solution: Elizabeth Lincoln
+
+--Q12 What is the name of the customer who ordered Raclette Courdavault more than once?
+select  c.CustomerName, count(c.CustomerID) from Customers c
+inner join orders o using(CustomerID)
+inner join OrderDetails od using(OrderID)
+inner join Products p using(ProductID)
+where p.ProductName = 'Raclette Courdavault'
+group by c.CustomerID;
+--Solution: Bottom-Dollar Marketse
+
+--Q13 What is the name of the supplier that generated most money from sales?
+SELECT s.SupplierName, sum(od.Quantity * p.Price) from Suppliers s
+inner join Products p using(SupplierID)
+inner join OrderDetails od using(ProductID)
+group by s.SupplierID
+order by  sum(od.Quantity * p.Price) desc;
+--Solution: Aux joyeux ecclésiastiques
+
+--Q14 What is the name of a category whose products generated most money from sales?
+select c.CategoryName, sum(od.Quantity *p.Price) as tot from Categories c
+inner join Products p using(CategoryID)
+inner join OrderDetails od using(ProductID)
+group by c.CategoryID
+order by tot desc;
+--Solution: Beverages
+
+--Q15 What date generated most money from sales?
+select o.OrderDate, sum(od.Quantity * p.Price) as tot from orders o
+inner join OrderDetails od using(OrderID)
+inner join Products p using(ProductID)
+group by o.OrderDate
+order by tot desc ;
+--23/01/1997
+
+--Q16 What is the contact name of a customer from the UK who never made any orders?
+select c.ContactName from Customers c
+LEFT join orders o using(CustomerID)
+where o.OrderID is NULL
+AND c.Country = 'UK';
+--Solution: Simon Crowther
+
+--Q17 Which country supplies the widest range of confections?
+ SELECT s.Country, count(*) FROM Suppliers s
+ INNER JOIN Products p USING(SupplierID)
+ INNER JOIN Categories c using(CategoryID)
+ where c.CategoryName = 'Confections'
+ GROUP by s.Country
+ ORDER BY count(*) DESC;
+--Solution: UK
+  
+--Q18 What is the name of the city with the highest number of orders delivered by Speedy Express?7
+SELECT C.City, count(o.OrderID) as tot from Shippers s
+inner join orders o using(ShipperID)
+inner join customers c using(CustomerID)
+where s.ShipperName = 'Speedy Express'
+group by c.City
+order by tot desc;
+--Solution: Graz
+
+--Q19 How many times have condiments packaged in bottles been ordered?
+SELECT count(OrderID) from Categories c
+inner join Products p using(CategoryID)
+inner join OrderDetails od using(ProductID)
+where c.CategoryName = 'Condiments'
+and p.Unit like '%bottles';
+--Solution: 15
+ 
+--Q20 What is the name of a product that is most frequently ordered in the USA?
+SELECT ProductName, count(o.OrderID) FROM Customers c
+inner join orders o using(CustomerID)
+inner join OrderDetails od using(OrderID)
+inner join Products p using(ProductID)
+where c.Country = 'USA'
+GROUP by ProductID 
+order by count(o.OrderID) desc ;
+--Solution: Tarte au sucre
