@@ -1,2 +1,3 @@
 # SQL
-In this repository i implemented a number of queries in the Northwind Database using SQLite.
+In this repository, a number of queries are implemented on the Northwind Database using SQLite.
+
